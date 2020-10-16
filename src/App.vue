@@ -38,7 +38,9 @@
         </md-card-actions>
       </md-card>
     </form>
-    <div v-if="preview.length > 0">
+    <div v-if="preview">
+      <div v-html="preview" />
+      <!--
       <md-table>
         <md-table-row>
           <md-table-head v-for="(k, i) in preview_headers" :key="i">
@@ -49,6 +51,7 @@
           <md-table-cell v-for="(k, i) in preview_headers" :key="i">{{row[k]}}</md-table-cell>
         </md-table-row>
       </md-table>
+      -->
     </div>
   </div>
 </template>
@@ -67,16 +70,18 @@ export default {
       from_value: 0,
       has_to_value: false,
       to_value: 1000,
-      preview: [],
+      preview: "",
     }
   },
   mounted: async function() {
     this.columns = (await this.$http.get(process.env.VUE_APP_BACKEND_URL + '/columns')).data
   },
   computed: {
+    /**
     preview_headers: function() {
       return Object.keys(this.preview[0])
     },
+    */
     params: function () {
       var params = {
         columns: this.selected_columns.join(','),
