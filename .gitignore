@@ -2,6 +2,7 @@
 node_modules
 /dist
 .ipynb_checkpoints
+workers-site/
 
 
 # local env files

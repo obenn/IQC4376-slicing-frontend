@@ -1,0 +1,9 @@
+name = "basa"
+type = "webpack"
+account_id = "eef43ffb7af8b4668e251f542e27d73d"
+route = "basa.strikethrough.net/*"
+zone_id = "a32c360875970539a2a0f4a4306444de"
+
+[site]
+bucket = "./dist"
+entry-point = "workers-site"
