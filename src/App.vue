@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <img alt="Plane" src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Ygnairport2006.jpg" />
+    <img alt="Plane" src="@/assets/logo.jpg">
     <p>Welcome to the basa data service</p>
     <form novalidate class="md-layout">
-      <md-card class="md-layout-item md-size-50 md-small-size-100">
+      <md-card id="selector-card" class="md-layout-item md-size-50 md-small-size-100">
         <md-card-header>
           <div class="md-title">Data</div>
         </md-card-header>
@@ -31,28 +31,21 @@
               </md-field>
             </div>
           </div>
+          <div>
+            <p>Filter results, see <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">this link</a> and <a href="https://www.sharpsightlabs.com/blog/pandas-query/">this guide</a> for more info.</p>
+              <md-field>
+                <md-input v-model="filter"></md-input>
+              </md-field>
+          </div>
         </md-card-content>
         <md-card-actions>
-          <md-button @click="activatePreview">Preview</md-button>
-          <md-button :href="this.downloadUri">Export</md-button>
+          <md-button class="md-raised" @click="activatePreview" :disabled="loading">Preview</md-button>
+          <md-button class="md-raised" :href="this.downloadUri" :disabled="loading">Export</md-button>
         </md-card-actions>
       </md-card>
     </form>
-    <div v-if="preview">
-      <div v-html="preview" />
-      <!--
-      <md-table>
-        <md-table-row>
-          <md-table-head v-for="(k, i) in preview_headers" :key="i">
-            {{ k }}
-          </md-table-head>
-        </md-table-row>
-        <md-table-row v-for="(row, index) in preview" :key="index">
-          <md-table-cell v-for="(k, i) in preview_headers" :key="i">{{row[k]}}</md-table-cell>
-        </md-table-row>
-      </md-table>
-      -->
-    </div>
+    <div v-if="preview && !loading" v-html="preview" ></div>
+    <md-progress-bar v-if="loading" md-mode="indeterminate"></md-progress-bar>
   </div>
 </template>
 
@@ -71,23 +64,20 @@ export default {
       has_to_value: false,
       to_value: 1000,
       preview: "",
+      filter: "",
+      loading: false,
     }
   },
   mounted: async function() {
     this.columns = (await this.$http.get(process.env.VUE_APP_BACKEND_URL + '/columns')).data
   },
   computed: {
-    /**
-    preview_headers: function() {
-      return Object.keys(this.preview[0])
-    },
-    */
     params: function () {
-      var params = {
-        columns: this.selected_columns.join(','),
-      }
-      if (this.has_from_value) params.beginning = this.from_value
-      if (this.has_to_value) params.end = this.to_value
+      var params = {}
+      if (this.selected_columns.length > 0) params.c = this.selected_columns.join(',')
+      if (this.has_from_value) params.s = this.from_value
+      if (this.has_to_value) params.e = this.to_value
+      if (this.filter.length > 0) params.f = this.filter
       return params
     },
     downloadUri: function() {
@@ -99,13 +89,19 @@ export default {
   },
   methods: {
     activatePreview: async function() {
+      this.loading = true
       this.preview = (await this.$http.get(process.env.VUE_APP_BACKEND_URL + '/preview', { params: this.params })).data
+      this.loading = false
     },
   }
 }
 </script>
 
 <style>
+#selector-card {
+  margin-left: auto;
+  margin-right: auto;
+}
 img {
   max-width: 200px;
 }
