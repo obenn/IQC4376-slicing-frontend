@@ -31,12 +31,36 @@
               </md-field>
             </div>
           </div>
+          <div class="md-layout md-gutter">
+            <div class="md-layout-item md-small-size-100">
+              <p>New column using arithemtic</p>
+              <p v-for="(v, index) in evals.values" :key="index">{{ v }}</p>
+              <md-field>
+                <md-input v-model="evals.buffer" md-clearable></md-input>
+              </md-field>
+              <md-button @click="addcol(evals)" :disabled="evals.buffer === '' || !evals.buffer.includes('=')">Add</md-button>
+              <md-button @click="popcol(evals)" :disabled="evals.values.length === 0">Pop</md-button>
+            </div>
+            <div class="md-layout-item md-small-size-100">
+              <p>New column using concatentation</p>
+              <p v-for="(v, index) in concats.values" :key="index">{{ v }}</p>
+              <md-field>
+                <md-input v-model="concats.buffer" md-clearable></md-input>
+              </md-field>
+              <md-button @click="addcol(concats)" :disabled="concats.buffer === '' || !concats.buffer.includes('=')">Add</md-button>
+              <md-button @click="popcol(concats)" :disabled="concats.values.length === 0">Pop</md-button>
+            </div>
+          </div>
           <div>
             <p>Filter results, see <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">this link</a> and <a href="https://www.sharpsightlabs.com/blog/pandas-query/">this guide</a> for more info.</p>
               <md-field>
                 <md-input v-model="filter"></md-input>
               </md-field>
           </div>
+            <md-field>
+              <label>Shareable query URL</label>
+              <md-input v-model="downloadUri" readonly md-autogrow></md-input>
+            </md-field>
         </md-card-content>
         <md-card-actions>
           <md-button class="md-raised" @click="activatePreview" :disabled="loading">Preview</md-button>
@@ -66,6 +90,14 @@ export default {
       preview: "",
       filter: "",
       loading: false,
+      concats: {
+        values: [],
+        buffer: '',
+      },
+      evals: {
+        values: [],
+        buffer: '',
+      },
     }
   },
   mounted: async function() {
@@ -74,10 +106,12 @@ export default {
   computed: {
     params: function () {
       var params = {}
-      if (this.selected_columns.length > 0) params.c = this.selected_columns.join(',')
-      if (this.has_from_value) params.s = this.from_value
-      if (this.has_to_value) params.e = this.to_value
-      if (this.filter.length > 0) params.f = this.filter
+      if (this.selected_columns.length > 0) params.col = this.selected_columns.join(',')
+      if (this.has_from_value) params.sta = this.from_value
+      if (this.has_to_value) params.end = this.to_value
+      if (this.filter.length > 0) params.fil = this.filter
+      if (this.concats.values.length > 0) params.con = this.concats.values.join(',')
+      if (this.evals.values.length > 0) params.eva = this.evals.values.join(',')
       return params
     },
     downloadUri: function() {
@@ -90,10 +124,22 @@ export default {
   methods: {
     activatePreview: async function() {
       this.loading = true
-      this.preview = (await this.$http.get(process.env.VUE_APP_BACKEND_URL + '/preview', { params: this.params })).data
+      try {
+        this.preview = (await this.$http.get(process.env.VUE_APP_BACKEND_URL + '/preview', { params: this.params })).data
+      }
+      catch {
+        this.preview = "Error running query"
+      }
       this.loading = false
     },
-  }
+    addcol: function(col) {
+      col.values.push(col.buffer);
+      col.buffer = '';
+    },
+    popcol: function(col) {
+      col.buffer = col.values.pop();
+    },
+  },
 }
 </script>
 
