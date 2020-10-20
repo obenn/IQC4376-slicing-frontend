@@ -51,20 +51,34 @@
               <md-button @click="popcol(concats)" :disabled="concats.values.length === 0">Pop</md-button>
             </div>
           </div>
-          <div>
-            <p>Filter results, see <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">this link</a> and <a href="https://www.sharpsightlabs.com/blog/pandas-query/">this guide</a> for more info.</p>
+          <div class="md-layout md-gutter">
+            <div class="md-layout-item md-small-size-100">
+              <p>Filter results, see <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">this link</a> and <a href="https://www.sharpsightlabs.com/blog/pandas-query/">this guide</a> for more info.</p>
+                <md-field>
+                  <md-input v-model="filter"></md-input>
+                </md-field>
+            </div>
+            <div class="md-layout-item md-small-size-100">
               <md-field>
-                <md-input v-model="filter"></md-input>
+                <p>Optional reducer for aggregate statistics</p>
+                <select v-model="reduce">
+                  <option value="none">None</option>
+                  <option value="mean">Mean</option>
+                  <option value="value_counts">Value Counts</option>
+                </select>
               </md-field>
+            </div>
           </div>
+          <div>
             <md-field>
               <label>Shareable query URL</label>
               <md-input v-model="downloadUri" readonly md-autogrow></md-input>
             </md-field>
+          </div>
         </md-card-content>
         <md-card-actions>
           <md-button class="md-raised" @click="activatePreview" :disabled="loading">Preview</md-button>
-          <md-button class="md-raised" :href="this.downloadUri" :disabled="loading">Export</md-button>
+          <md-button class="md-raised" :href="downloadUri" :disabled="loading">Export</md-button>
         </md-card-actions>
       </md-card>
     </form>
@@ -90,6 +104,7 @@ export default {
       preview: "",
       filter: "",
       loading: false,
+      reduce: "none",
       concats: {
         values: [],
         buffer: '',
@@ -112,13 +127,17 @@ export default {
       if (this.filter.length > 0) params.fil = this.filter
       if (this.concats.values.length > 0) params.con = this.concats.values.join(',')
       if (this.evals.values.length > 0) params.eva = this.evals.values.join(',')
+      if (this.reduce != 'none') params.red = this.reduce
       return params
     },
-    downloadUri: function() {
-      return this.$http.getUri({
-        url: process.env.VUE_APP_BACKEND_URL + '/subset',
-        params: this.params,
-      })
+    downloadUri: {
+      get: function() {
+        return this.$http.getUri({
+          url: process.env.VUE_APP_BACKEND_URL + '/subset',
+          params: this.params,
+        })
+      },
+      set: function() {},
     }
   },
   methods: {
