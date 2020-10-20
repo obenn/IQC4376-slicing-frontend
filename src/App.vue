@@ -33,7 +33,7 @@
           </div>
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
-              <p>New column using arithemtic</p>
+              <p>New column using arithmetic</p>
               <p v-for="(v, index) in evals.values" :key="index">{{ v }}</p>
               <md-field>
                 <md-input v-model="evals.buffer" md-clearable></md-input>
@@ -65,6 +65,7 @@
                   <option value="none">None</option>
                   <option value="mean">Mean</option>
                   <option value="value_counts">Value Counts</option>
+                  <option value="std">Standard deviation</option>
                 </select>
               </md-field>
             </div>
