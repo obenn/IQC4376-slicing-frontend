@@ -10,7 +10,7 @@
         <md-card-content>
           <!-- COLUMN SELECTOR -->
           <md-menu>
-            <md-button md-menu-trigger>Columns</md-button>
+            <md-button md-menu-trigger class="md-raised">Select Columns to output</md-button>
             <md-menu-content>
               <md-menu-item v-for="(column, index) in columns" :key="index">
                 <md-checkbox v-model="selected_columns" :value="column">{{ column }}</md-checkbox> 
@@ -34,17 +34,21 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <p>New column using arithmetic</p>
+              <p><i>Example: colname = order - Pass_ID</i></p>
               <p v-for="(v, index) in evals.values" :key="index">{{ v }}</p>
               <md-field>
-                <md-input v-model="evals.buffer" md-clearable></md-input>
+                <label>Expression</label>
+                <md-input v-model="evals.buffer" md-clearable ></md-input>
               </md-field>
               <md-button @click="addcol(evals)" :disabled="evals.buffer === '' || !evals.buffer.includes('=')">Add</md-button>
               <md-button @click="popcol(evals)" :disabled="evals.values.length === 0">Pop</md-button>
             </div>
             <div class="md-layout-item md-small-size-100">
               <p>New column using concatentation</p>
+              <p><i>Example: colname = order + Pass_ID</i></p>
               <p v-for="(v, index) in concats.values" :key="index">{{ v }}</p>
               <md-field>
+                <label>Expression</label>
                 <md-input v-model="concats.buffer" md-clearable></md-input>
               </md-field>
               <md-button @click="addcol(concats)" :disabled="concats.buffer === '' || !concats.buffer.includes('=')">Add</md-button>
@@ -54,9 +58,11 @@
           <div class="md-layout md-gutter">
             <div class="md-layout-item md-small-size-100">
               <p>Filter results, see <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html">this link</a> and <a href="https://www.sharpsightlabs.com/blog/pandas-query/">this guide</a> for more info.</p>
-                <md-field>
-                  <md-input v-model="filter"></md-input>
-                </md-field>
+              <p><i>Example: Pass_ID == 2.0 and Airfield == 'AUC'</i></p>
+              <md-field>
+                <label>Expression</label>
+                <md-input v-model="filter"></md-input>
+              </md-field>
             </div>
             <div class="md-layout-item md-small-size-100">
               <md-field>
